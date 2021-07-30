@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.is.key.manager.core.tokenmgt.issuers;
+package org.wso2.is.key.manager.scope.issuers;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;

@@ -17,7 +17,7 @@
  * /
  */
 
-package org.wso2.is.key.manager.core.internal;
+package org.wso2.is.key.manager.scope.issuers.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,40 +28,31 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
-import org.wso2.carbon.core.ServerStartupObserver;
-import org.wso2.carbon.identity.auth.service.handler.AuthenticationHandler;
-import org.wso2.carbon.identity.core.util.IdentityCoreInitializedEvent;
+import org.wso2.carbon.identity.oauth2.validators.scope.ScopeValidator;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.user.core.service.RealmService;
-import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 import org.wso2.carbon.utils.ConfigurationContextService;
-import org.wso2.is.key.manager.core.handlers.ExtendedISAuthHandler;
-import org.wso2.is.key.manager.core.observers.ReservedUserCreationObserver;
+import org.wso2.is.key.manager.scope.issuers.RoleBasedScopesIssuer;
 
 /**
- * KeyManager core component to handle authentication
+ * KeyManager scope issuer component
  */
 @Component(
-        name = "key.manager.core.component",
+        name = "key.manager.scope.issuer.component",
         immediate = true
 )
-public class KeyManagerCoreServiceComponent {
+public class KeyManagerScopeIssuerComponent {
 
-    private static final Log log = LogFactory.getLog(KeyManagerCoreServiceComponent.class);
+    private static final Log log = LogFactory.getLog(KeyManagerScopeIssuerComponent.class);
 
     @Activate
     protected void activate(ComponentContext cxt) {
 
         try {
-            cxt.getBundleContext().registerService(AuthenticationHandler.class, new ExtendedISAuthHandler(), null);
-            ReservedUserCreationObserver reservedUserCreationObserver = new ReservedUserCreationObserver();
-            cxt.getBundleContext().registerService(Axis2ConfigurationContextObserver.class.getName(),
-                    reservedUserCreationObserver, null);
-            cxt.getBundleContext().registerService(ServerStartupObserver.class.getName(),
-                    reservedUserCreationObserver, null);
+            cxt.getBundleContext().registerService(ScopeValidator.class, new RoleBasedScopesIssuer(), null);
             if (log.isDebugEnabled()) {
-                log.debug("KeyManagerCoreService is activated");
+                log.debug("Scope issuer component is activated");
             }
         } catch (Throwable e) {
             log.error(e.getMessage(), e);
@@ -72,10 +63,13 @@ public class KeyManagerCoreServiceComponent {
     protected void deactivate(ComponentContext context) {
 
         if (log.isDebugEnabled()) {
-            log.debug("KeyManagerCoreService bundle is deactivated");
+            log.debug("Scope issuer component is deactivated");
         }
     }
 
+    // TODO: 2021-07-29 may be add a dummy reference to wait till the core is initialized
+
+    // TODO: 2021-07-29 check on these references
     @Reference(
             name = "user.realm.service",
             service = org.wso2.carbon.user.core.service.RealmService.class,
@@ -93,22 +87,6 @@ public class KeyManagerCoreServiceComponent {
     protected void unsetRealmService(RealmService realmService) {
 
         ServiceReferenceHolder.getInstance().setRealmService(null);
-    }
-
-    @Reference(
-            name = "identityCoreInitializedEventService",
-            service = org.wso2.carbon.identity.core.util.IdentityCoreInitializedEvent.class,
-            cardinality = ReferenceCardinality.MANDATORY,
-            policy = ReferencePolicy.DYNAMIC,
-            unbind = "unsetIdentityCoreInitializedEventService")
-    protected void setIdentityCoreInitializedEventService(IdentityCoreInitializedEvent identityCoreInitializedEvent) {
-    /* reference IdentityCoreInitializedEvent service to guarantee that this component will wait until identity core
-         is started */
-    }
-
-    protected void unsetIdentityCoreInitializedEventService(IdentityCoreInitializedEvent identityCoreInitializedEvent) {
-    /* reference IdentityCoreInitializedEvent service to guarantee that this component will wait until identity core
-         is started */
     }
 
     @Reference(

@@ -17,7 +17,7 @@
  *
  */
 
-package org.wso2.is.key.manager.core.tokenmgt.issuers;
+package org.wso2.is.key.manager.scope.issuers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

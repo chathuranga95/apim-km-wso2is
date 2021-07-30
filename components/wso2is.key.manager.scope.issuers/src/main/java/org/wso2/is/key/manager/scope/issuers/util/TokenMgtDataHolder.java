@@ -17,13 +17,13 @@
  *
  */
 
-package org.wso2.is.key.manager.core.tokenmgt.util;
+package org.wso2.is.key.manager.scope.issuers.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.user.core.service.RealmService;
-import org.wso2.is.key.manager.core.tokenmgt.issuers.AbstractScopesIssuer;
+import org.wso2.is.key.manager.scope.issuers.AbstractScopesIssuer;
 
 import java.util.HashMap;
 import java.util.Map;
